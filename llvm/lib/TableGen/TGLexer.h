@@ -186,13 +186,9 @@ private:
 public:
   TGLexer(SourceMgr &SrcMgr, ArrayRef<std::string> Macros);
 
-  tgtok::TokKind Lex() {
-    return CurCode = LexToken(CurPtr == CurBuf.begin());
-  }
+  tgtok::TokKind Lex() { return CurCode = LexToken(CurPtr == CurBuf.begin()); }
 
-  const DependenciesSetTy &getDependencies() const {
-    return Dependencies;
-  }
+  const DependenciesSetTy &getDependencies() const { return Dependencies; }
 
   tgtok::TokKind getCode() const { return CurCode; }
 
@@ -209,7 +205,7 @@ public:
   std::pair<int64_t, unsigned> getCurBinaryIntVal() const {
     assert(CurCode == tgtok::BinaryIntVal &&
            "This token isn't a binary integer");
-    return std::make_pair(CurIntVal, (CurPtr - TokStart)-2);
+    return std::make_pair(CurIntVal, (CurPtr - TokStart) - 2);
   }
 
   SMLoc getLoc() const;

@@ -163,9 +163,9 @@ class TGParser {
   // in the middle of creating in.  For those situations, allow the
   // parser to ignore missing object errors.
   enum IDParseMode {
-    ParseValueMode,   // We are parsing a value we expect to look up.
-    ParseNameMode,    // We are parsing a name of an object that does not yet
-                      // exist.
+    ParseValueMode, // We are parsing a value we expect to look up.
+    ParseNameMode,  // We are parsing a name of an object that does not yet
+                    // exist.
   };
 
   bool NoWarnOnUnusedTemplateArgs = false;
@@ -187,9 +187,7 @@ public:
     PrintError(L, Msg);
     return true;
   }
-  bool TokError(const Twine &Msg) const {
-    return Error(Lex.getLoc(), Msg);
-  }
+  bool TokError(const Twine &Msg) const { return Error(Lex.getLoc(), Msg); }
   const TGLexer::DependenciesSetTy &getDependencies() const {
     return Lex.getDependencies();
   }
@@ -252,7 +250,7 @@ private: // Semantic analysis methods.
                                     ArrayRef<ArgumentInit *> ArgValues,
                                     Init *DefmName, SMLoc Loc);
 
-private:  // Parser methods.
+private: // Parser methods.
   bool consume(tgtok::TokKind K);
   bool ParseObjectList(MultiClass *MC = nullptr);
   bool ParseObject(MultiClass *MC);
@@ -286,12 +284,12 @@ private:  // Parser methods.
                          IDParseMode Mode = ParseValueMode);
   Init *ParseValue(Record *CurRec, RecTy *ItemType = nullptr,
                    IDParseMode Mode = ParseValueMode);
-  void ParseValueList(SmallVectorImpl<llvm::Init*> &Result,
-                      Record *CurRec, RecTy *ItemType = nullptr);
+  void ParseValueList(SmallVectorImpl<llvm::Init *> &Result, Record *CurRec,
+                      RecTy *ItemType = nullptr);
   bool ParseTemplateArgValueList(SmallVectorImpl<llvm::ArgumentInit *> &Result,
                                  Record *CurRec, Record *ArgsRec);
   void ParseDagArgList(
-      SmallVectorImpl<std::pair<llvm::Init*, StringInit*>> &Result,
+      SmallVectorImpl<std::pair<llvm::Init *, StringInit *>> &Result,
       Record *CurRec);
   bool ParseOptionalRangeList(SmallVectorImpl<unsigned> &Ranges);
   bool ParseOptionalBitList(SmallVectorImpl<unsigned> &Ranges);

@@ -35,13 +35,11 @@ namespace {
 struct {
   tgtok::TokKind Kind;
   const char *Word;
-} PreprocessorDirs[] = {
-  { tgtok::Ifdef, "ifdef" },
-  { tgtok::Ifndef, "ifndef" },
-  { tgtok::Else, "else" },
-  { tgtok::Endif, "endif" },
-  { tgtok::Define, "define" }
-};
+} PreprocessorDirs[] = {{tgtok::Ifdef, "ifdef"},
+                        {tgtok::Ifndef, "ifndef"},
+                        {tgtok::Else, "else"},
+                        {tgtok::Endif, "endif"},
+                        {tgtok::Define, "define"}};
 } // end anonymous namespace
 
 TGLexer::TGLexer(SourceMgr &SM, ArrayRef<std::string> Macros) : SrcMgr(SM) {
@@ -59,9 +57,7 @@ TGLexer::TGLexer(SourceMgr &SM, ArrayRef<std::string> Macros) : SrcMgr(SM) {
     DefinedMacros.insert(MacroName);
 }
 
-SMLoc TGLexer::getLoc() const {
-  return SMLoc::getFromPointer(TokStart);
-}
+SMLoc TGLexer::getLoc() const { return SMLoc::getFromPointer(TokStart); }
 
 SMRange TGLexer::getLocRange() const {
   return {getLoc(), SMLoc::getFromPointer(CurPtr)};
@@ -128,16 +124,13 @@ int TGLexer::getNextChar() {
     // Handle the newline character by ignoring it and incrementing the line
     // count.  However, be careful about 'dos style' files with \n\r in them.
     // Only treat a \n\r or \r\n as a single line.
-    if ((*CurPtr == '\n' || (*CurPtr == '\r')) &&
-        *CurPtr != CurChar)
-      ++CurPtr;  // Eat the two char newline sequence.
+    if ((*CurPtr == '\n' || (*CurPtr == '\r')) && *CurPtr != CurChar)
+      ++CurPtr; // Eat the two char newline sequence.
     return '\n';
   }
 }
 
-int TGLexer::peekNextChar(int Index) const {
-  return *(CurPtr + Index);
-}
+int TGLexer::peekNextChar(int Index) const { return *(CurPtr + Index); }
 
 tgtok::TokKind TGLexer::LexToken(bool FileOrLineStart) {
   TokStart = CurPtr;
@@ -164,18 +157,30 @@ tgtok::TokKind TGLexer::LexToken(bool FileOrLineStart) {
     // Return EOF denoting the end of lexing.
     return tgtok::Eof;
 
-  case ':': return tgtok::colon;
-  case ';': return tgtok::semi;
-  case ',': return tgtok::comma;
-  case '<': return tgtok::less;
-  case '>': return tgtok::greater;
-  case ']': return tgtok::r_square;
-  case '{': return tgtok::l_brace;
-  case '}': return tgtok::r_brace;
-  case '(': return tgtok::l_paren;
-  case ')': return tgtok::r_paren;
-  case '=': return tgtok::equal;
-  case '?': return tgtok::question;
+  case ':':
+    return tgtok::colon;
+  case ';':
+    return tgtok::semi;
+  case ',':
+    return tgtok::comma;
+  case '<':
+    return tgtok::less;
+  case '>':
+    return tgtok::greater;
+  case ']':
+    return tgtok::r_square;
+  case '{':
+    return tgtok::l_brace;
+  case '}':
+    return tgtok::r_brace;
+  case '(':
+    return tgtok::l_paren;
+  case ')':
+    return tgtok::r_paren;
+  case '=':
+    return tgtok::equal;
+  case '?':
+    return tgtok::question;
   case '#':
     if (FileOrLineStart) {
       tgtok::TokKind Kind = prepIsDirective();
@@ -220,9 +225,18 @@ tgtok::TokKind TGLexer::LexToken(bool FileOrLineStart) {
     } else // Otherwise, this is an error.
       return ReturnError(TokStart, "Unexpected character");
     return LexToken(FileOrLineStart);
-  case '-': case '+':
-  case '0': case '1': case '2': case '3': case '4': case '5': case '6':
-  case '7': case '8': case '9': {
+  case '-':
+  case '+':
+  case '0':
+  case '1':
+  case '2':
+  case '3':
+  case '4':
+  case '5':
+  case '6':
+  case '7':
+  case '8':
+  case '9': {
     int NextChar = 0;
     if (isdigit(CurChar)) {
       // Allow identifiers to start with a number if it is followed by
@@ -240,14 +254,31 @@ tgtok::TokKind TGLexer::LexToken(bool FileOrLineStart) {
         switch (NextNextChar) {
         default:
           break;
-        case '0': case '1':
+        case '0':
+        case '1':
           if (NextChar == 'b')
             return LexNumber();
           [[fallthrough]];
-        case '2': case '3': case '4': case '5':
-        case '6': case '7': case '8': case '9':
-        case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-        case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+        case 'e':
+        case 'f':
+        case 'A':
+        case 'B':
+        case 'C':
+        case 'D':
+        case 'E':
+        case 'F':
           if (NextChar == 'x')
             return LexNumber();
           break;
@@ -260,10 +291,14 @@ tgtok::TokKind TGLexer::LexToken(bool FileOrLineStart) {
 
     return LexNumber();
   }
-  case '"': return LexString();
-  case '$': return LexVarName();
-  case '[': return LexBracket();
-  case '!': return LexExclaim();
+  case '"':
+    return LexString();
+  case '$':
+    return LexVarName();
+  case '[':
+    return LexBracket();
+  case '!':
+    return LexExclaim();
   }
 }
 
@@ -289,7 +324,9 @@ tgtok::TokKind TGLexer::LexString() {
     ++CurPtr;
 
     switch (*CurPtr) {
-    case '\\': case '\'': case '"':
+    case '\\':
+    case '\'':
+    case '"':
       // These turn into their literal character.
       CurStrVal += *CurPtr++;
       break;
@@ -343,45 +380,46 @@ tgtok::TokKind TGLexer::LexIdentifier() {
     ++CurPtr;
 
   // Check to see if this identifier is a reserved keyword.
-  StringRef Str(IdentStart, CurPtr-IdentStart);
+  StringRef Str(IdentStart, CurPtr - IdentStart);
 
   tgtok::TokKind Kind = StringSwitch<tgtok::TokKind>(Str)
-    .Case("int", tgtok::Int)
-    .Case("bit", tgtok::Bit)
-    .Case("bits", tgtok::Bits)
-    .Case("string", tgtok::String)
-    .Case("list", tgtok::List)
-    .Case("code", tgtok::Code)
-    .Case("dag", tgtok::Dag)
-    .Case("class", tgtok::Class)
-    .Case("def", tgtok::Def)
-    .Case("true", tgtok::TrueVal)
-    .Case("false", tgtok::FalseVal)
-    .Case("foreach", tgtok::Foreach)
-    .Case("defm", tgtok::Defm)
-    .Case("defset", tgtok::Defset)
-    .Case("multiclass", tgtok::MultiClass)
-    .Case("field", tgtok::Field)
-    .Case("let", tgtok::Let)
-    .Case("in", tgtok::In)
-    .Case("defvar", tgtok::Defvar)
-    .Case("include", tgtok::Include)
-    .Case("if", tgtok::If)
-    .Case("then", tgtok::Then)
-    .Case("else", tgtok::ElseKW)
-    .Case("assert", tgtok::Assert)
-    .Default(tgtok::Id);
+                            .Case("int", tgtok::Int)
+                            .Case("bit", tgtok::Bit)
+                            .Case("bits", tgtok::Bits)
+                            .Case("string", tgtok::String)
+                            .Case("list", tgtok::List)
+                            .Case("code", tgtok::Code)
+                            .Case("dag", tgtok::Dag)
+                            .Case("class", tgtok::Class)
+                            .Case("def", tgtok::Def)
+                            .Case("true", tgtok::TrueVal)
+                            .Case("false", tgtok::FalseVal)
+                            .Case("foreach", tgtok::Foreach)
+                            .Case("defm", tgtok::Defm)
+                            .Case("defset", tgtok::Defset)
+                            .Case("multiclass", tgtok::MultiClass)
+                            .Case("field", tgtok::Field)
+                            .Case("let", tgtok::Let)
+                            .Case("in", tgtok::In)
+                            .Case("defvar", tgtok::Defvar)
+                            .Case("include", tgtok::Include)
+                            .Case("if", tgtok::If)
+                            .Case("then", tgtok::Then)
+                            .Case("else", tgtok::ElseKW)
+                            .Case("assert", tgtok::Assert)
+                            .Default(tgtok::Id);
 
   // A couple of tokens require special processing.
   switch (Kind) {
-    case tgtok::Include:
-      if (LexInclude()) return tgtok::Error;
-      return Lex();
-    case tgtok::Id:
-      CurStrVal.assign(Str.begin(), Str.end());
-      break;
-    default:
-      break;
+  case tgtok::Include:
+    if (LexInclude())
+      return tgtok::Error;
+    return Lex();
+  case tgtok::Id:
+    CurStrVal.assign(Str.begin(), Str.end());
+    break;
+  default:
+    break;
   }
 
   return Kind;
@@ -392,7 +430,8 @@ tgtok::TokKind TGLexer::LexIdentifier() {
 bool TGLexer::LexInclude() {
   // The token after the include must be a string.
   tgtok::TokKind Tok = LexToken();
-  if (Tok == tgtok::Error) return true;
+  if (Tok == tgtok::Error)
+    return true;
   if (Tok != tgtok::StrVal) {
     PrintError(getLoc(), "Expected filename after include");
     return true;
@@ -422,7 +461,7 @@ bool TGLexer::LexInclude() {
 /// SkipBCPLComment - Skip over the comment by finding the next CR or LF.
 /// Or we may end up at the end of the buffer.
 void TGLexer::SkipBCPLComment() {
-  ++CurPtr;  // skip the second slash.
+  ++CurPtr; // skip the second slash.
   auto EOLPos = CurBuf.find_first_of("\r\n", CurPtr - CurBuf.data());
   CurPtr = (EOLPos == StringRef::npos) ? CurBuf.end() : CurBuf.data() + EOLPos;
 }
@@ -430,7 +469,7 @@ void TGLexer::SkipBCPLComment() {
 /// SkipCComment - This skips C-style /**/ comments.  The only difference from C
 /// is that we allow nesting.
 bool TGLexer::SkipCComment() {
-  ++CurPtr;  // skip the star.
+  ++CurPtr; // skip the star.
   unsigned CommentDepth = 1;
 
   while (true) {
@@ -441,15 +480,17 @@ bool TGLexer::SkipCComment() {
       return true;
     case '*':
       // End of the comment?
-      if (CurPtr[0] != '/') break;
+      if (CurPtr[0] != '/')
+        break;
 
-      ++CurPtr;   // End the */.
+      ++CurPtr; // End the */.
       if (--CommentDepth == 0)
         return false;
       break;
     case '/':
       // Start of a nested comment?
-      if (CurPtr[0] != '*') break;
+      if (CurPtr[0] != '*')
+        break;
       ++CurPtr;
       ++CommentDepth;
       break;
@@ -494,7 +535,7 @@ tgtok::TokKind TGLexer::LexNumber() {
 
       // Requires at least one binary digit.
       if (CurPtr == NumStart)
-        return ReturnError(CurPtr-2, "Invalid binary number");
+        return ReturnError(CurPtr - 2, "Invalid binary number");
       CurIntVal = strtoll(NumStart, nullptr, 2);
       return tgtok::BinaryIntVal;
     }
@@ -523,14 +564,17 @@ tgtok::TokKind TGLexer::LexBracket() {
   const char *CodeStart = CurPtr;
   while (true) {
     int Char = getNextChar();
-    if (Char == EOF) break;
+    if (Char == EOF)
+      break;
 
-    if (Char != '}') continue;
+    if (Char != '}')
+      continue;
 
     Char = getNextChar();
-    if (Char == EOF) break;
+    if (Char == EOF)
+      break;
     if (Char == ']') {
-      CurStrVal.assign(CodeStart, CurPtr-2);
+      CurStrVal.assign(CodeStart, CurPtr - 2);
       return tgtok::CodeFragment;
     }
   }
@@ -601,7 +645,8 @@ tgtok::TokKind TGLexer::LexExclaim() {
           .Case("toupper", tgtok::XToUpper)
           .Default(tgtok::Error);
 
-  return Kind != tgtok::Error ? Kind : ReturnError(Start-1, "Unknown operator");
+  return Kind != tgtok::Error ? Kind
+                              : ReturnError(Start - 1, "Unknown operator");
 }
 
 bool TGLexer::prepExitInclude(bool IncludeStackMustBeEmpty) {
@@ -701,8 +746,8 @@ bool TGLexer::prepEatPreprocessorDirective(tgtok::TokKind Kind) {
   return false;
 }
 
-tgtok::TokKind TGLexer::lexPreprocessor(
-    tgtok::TokKind Kind, bool ReturnNextLiveToken) {
+tgtok::TokKind TGLexer::lexPreprocessor(tgtok::TokKind Kind,
+                                        bool ReturnNextLiveToken) {
 
   // We must be looking at a preprocessing directive.  Eat it!
   if (!prepEatPreprocessorDirective(Kind))

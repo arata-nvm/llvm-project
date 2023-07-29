@@ -372,6 +372,13 @@ public:
                                 const llvm::RecordVal *value,
                                 const SMRange &hoverRange);
 
+  //===--------------------------------------------------------------------===//
+  // Code Completion
+  //===--------------------------------------------------------------------===//
+
+  lsp::CompletionList getCodeCompletion(const lsp::URIForFile &uri,
+                                        const lsp::Position completePos);
+
 private:
   /// Initialize the text file from the given file contents.
   void initialize(const lsp::URIForFile &uri, int64_t newVersion,
@@ -645,6 +652,17 @@ lsp::Hover TableGenTextFile::buildHoverForField(const llvm::Record *record,
 }
 
 //===----------------------------------------------------------------------===//
+// TableGenTextFile: Hover
+//===----------------------------------------------------------------------===//
+
+lsp::CompletionList
+TableGenTextFile::getCodeCompletion(const lsp::URIForFile &uri,
+                                    const lsp::Position completePos) {
+  lsp::CompletionList completionList;
+  return completionList;
+}
+
+//===----------------------------------------------------------------------===//
 // TableGenServer::Impl
 //===----------------------------------------------------------------------===//
 
@@ -738,4 +756,13 @@ lsp::TableGenServer::findHover(const URIForFile &uri,
   if (fileIt != impl->files.end())
     return fileIt->second->findHover(uri, hoverPos);
   return std::nullopt;
+}
+
+lsp::CompletionList
+lsp::TableGenServer::getCodeCompletion(const URIForFile &uri,
+                                       const Position &completePos) {
+  auto fileIt = impl->files.find(uri.file());
+  if (fileIt != impl->files.end())
+    return fileIt->second->getCodeCompletion(uri, completePos);
+  return CompletionList();
 }

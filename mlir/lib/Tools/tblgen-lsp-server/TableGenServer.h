@@ -12,11 +12,12 @@
 #include "mlir/Support/LLVM.h"
 #include "llvm/ADT/StringRef.h"
 #include <memory>
-#include <string>
 #include <optional>
+#include <string>
 
 namespace mlir {
 namespace lsp {
+struct CompletionList;
 struct Diagnostic;
 struct DocumentLink;
 struct Hover;
@@ -78,6 +79,9 @@ public:
   /// one couldn't be found.
   std::optional<Hover> findHover(const URIForFile &uri,
                                  const Position &hoverPos);
+
+  CompletionList getCodeCompletion(const URIForFile &uri,
+                                   const Position &completePos);
 
 private:
   struct Impl;

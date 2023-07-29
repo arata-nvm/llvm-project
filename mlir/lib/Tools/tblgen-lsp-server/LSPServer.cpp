@@ -64,6 +64,12 @@ struct LSPServer {
                Callback<std::optional<Hover>> reply);
 
   //===--------------------------------------------------------------------===//
+  // Code Completion
+
+  void onCompletion(const CompletionParams &params,
+                    Callback<CompletionList> reply);
+
+  //===--------------------------------------------------------------------===//
   // Fields
   //===--------------------------------------------------------------------===//
 
@@ -100,6 +106,7 @@ void LSPServer::onInitialize(const InitializeParams &params,
            {"resolveProvider", false},
        }},
       {"hoverProvider", true},
+      {"completionProvider", true},
   };
 
   llvm::json::Object result{
@@ -184,6 +191,14 @@ void LSPServer::onHover(const TextDocumentPositionParams &params,
 }
 
 //===----------------------------------------------------------------------===//
+// Code Completion
+
+void LSPServer::onCompletion(const CompletionParams &params,
+                             Callback<CompletionList> reply) {
+  reply(server.getCodeCompletion(params.textDocument.uri, params.position));
+}
+
+//===----------------------------------------------------------------------===//
 // Entry Point
 //===----------------------------------------------------------------------===//
 
@@ -218,6 +233,10 @@ LogicalResult mlir::lsp::runTableGenLSPServer(TableGenServer &server,
 
   // Hover
   messageHandler.method("textDocument/hover", &lspServer, &LSPServer::onHover);
+
+  // Code Completion
+  messageHandler.method("textDocument/completion", &lspServer,
+                        &LSPServer::onCompletion);
 
   // Diagnostics
   lspServer.publishDiagnostics =

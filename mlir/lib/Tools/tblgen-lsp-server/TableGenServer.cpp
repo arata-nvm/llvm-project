@@ -652,7 +652,7 @@ lsp::Hover TableGenTextFile::buildHoverForField(const llvm::Record *record,
 }
 
 //===----------------------------------------------------------------------===//
-// TableGenTextFile: Hover
+// TableGenTextFile: Code Completion
 //===----------------------------------------------------------------------===//
 
 namespace {

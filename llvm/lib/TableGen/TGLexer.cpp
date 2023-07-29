@@ -42,7 +42,9 @@ struct {
                         {tgtok::Define, "define"}};
 } // end anonymous namespace
 
-TGLexer::TGLexer(SourceMgr &SM, ArrayRef<std::string> Macros) : SrcMgr(SM) {
+TGLexer::TGLexer(SourceMgr &SM, ArrayRef<std::string> Macros,
+                 CodeCompleteContext *CompleteContext)
+    : SrcMgr(SM) {
   CurBuffer = SrcMgr.getMainFileID();
   CurBuf = SrcMgr.getMemoryBuffer(CurBuffer)->getBuffer();
   CurPtr = CurBuf.begin();
@@ -55,6 +57,9 @@ TGLexer::TGLexer(SourceMgr &SM, ArrayRef<std::string> Macros) : SrcMgr(SM) {
   // Put all macros defined in the command line into the DefinedMacros set.
   for (const std::string &MacroName : Macros)
     DefinedMacros.insert(MacroName);
+
+  if (CompleteContext)
+    CompleteLoc = CompleteContext->getCodeCompleteLoc().getPointer();
 }
 
 SMLoc TGLexer::getLoc() const { return SMLoc::getFromPointer(TokStart); }
@@ -420,6 +425,10 @@ tgtok::TokKind TGLexer::LexIdentifier() {
     break;
   default:
     break;
+  }
+
+  if (CompleteLoc && IdentStart <= CompleteLoc && CompleteLoc <= CurPtr) {
+    return tgtok::CodeComplete;
   }
 
   return Kind;

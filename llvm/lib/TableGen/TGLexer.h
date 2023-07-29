@@ -17,6 +17,7 @@
 #include "llvm/ADT/StringSet.h"
 #include "llvm/Support/DataTypes.h"
 #include "llvm/Support/SMLoc.h"
+#include "llvm/TableGen/CodeComplete.h"
 #include <cassert>
 #include <memory>
 #include <set>
@@ -33,6 +34,7 @@ enum TokKind {
   // Markers
   Eof,
   Error,
+  CodeComplete,
 
   // Tokens with no info.
   minus,     // -
@@ -176,6 +178,8 @@ class TGLexer {
   /// by the SourceMgr object.
   unsigned CurBuffer = 0;
 
+  const char *CompleteLoc = nullptr;
+
 public:
   typedef std::set<std::string> DependenciesSetTy;
 
@@ -184,13 +188,16 @@ private:
   DependenciesSetTy Dependencies;
 
 public:
-  TGLexer(SourceMgr &SrcMgr, ArrayRef<std::string> Macros);
+  TGLexer(SourceMgr &SrcMgr, ArrayRef<std::string> Macros,
+          CodeCompleteContext *CompleteContext);
 
   tgtok::TokKind Lex() { return CurCode = LexToken(CurPtr == CurBuf.begin()); }
 
   const DependenciesSetTy &getDependencies() const { return Dependencies; }
 
   tgtok::TokKind getCode() const { return CurCode; }
+
+  bool isCodeComplete() const { return CurCode == tgtok::CodeComplete; }
 
   const std::string &getCurStrVal() const {
     assert((CurCode == tgtok::Id || CurCode == tgtok::StrVal ||

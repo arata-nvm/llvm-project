@@ -14,6 +14,7 @@
 #define LLVM_TABLEGEN_PARSER_H
 
 #include "llvm/ADT/STLExtras.h"
+#include "llvm/TableGen/CodeComplete.h"
 #include <string>
 #include <vector>
 
@@ -27,7 +28,8 @@ class SourceMgr;
 ///
 /// NOTE: TableGen currently relies on global state within a given parser
 ///       invocation, so this function is not thread-safe.
-bool TableGenParseFile(SourceMgr &InputSrcMgr, RecordKeeper &Records);
+bool TableGenParseFile(SourceMgr &InputSrcMgr, RecordKeeper &Records,
+                       CodeCompleteContext *CompleteContext = nullptr);
 
 } // end namespace llvm
 

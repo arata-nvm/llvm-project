@@ -13,7 +13,8 @@
 
 using namespace llvm;
 
-bool llvm::TableGenParseFile(SourceMgr &InputSrcMgr, RecordKeeper &Records) {
+bool llvm::TableGenParseFile(SourceMgr &InputSrcMgr, RecordKeeper &Records,
+                             CodeCompleteContext *CompleteContext) {
   // Initialize the global TableGen source manager by temporarily taking control
   // of the input buffer in `SrcMgr`. This is kind of a hack, but allows for
   // preserving TableGen's current awkward diagnostic behavior. If we can remove
@@ -30,7 +31,7 @@ bool llvm::TableGenParseFile(SourceMgr &InputSrcMgr, RecordKeeper &Records) {
 
   TGParser Parser(SrcMgr, /*Macros=*/std::nullopt, Records,
                   /*NoWarnOnUnusedTemplateArgs=*/false,
-                  /*TrackReferenceLocs=*/true);
+                  /*TrackReferenceLocs=*/true, CompleteContext);
   bool ParseResult = Parser.ParseFile();
 
   // After parsing, reclaim the source manager buffers from TableGen's global

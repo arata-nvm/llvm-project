@@ -655,10 +655,38 @@ lsp::Hover TableGenTextFile::buildHoverForField(const llvm::Record *record,
 // TableGenTextFile: Hover
 //===----------------------------------------------------------------------===//
 
+namespace {
+class TableGenCodeCompleteContext : public llvm::CodeCompleteContext {
+  lsp::CompletionList &completionList;
+
+public:
+  TableGenCodeCompleteContext(SMLoc codeCompleteLoc,
+                              lsp::CompletionList &completionList)
+      : CodeCompleteContext(codeCompleteLoc), completionList(completionList) {}
+};
+} // namespace
+
 lsp::CompletionList
 TableGenTextFile::getCodeCompletion(const lsp::URIForFile &uri,
                                     const lsp::Position completePos) {
   lsp::CompletionList completionList;
+
+  auto memBuffer = llvm::MemoryBuffer::getMemBuffer(contents, uri.file());
+  if (!memBuffer) {
+    lsp::Logger::error("Failed to create memory buffer for file", uri.file());
+    return completionList;
+  }
+
+  auto sourceMgr = llvm::SourceMgr();
+  sourceMgr.setIncludeDirs(includeDirs);
+  sourceMgr.AddNewSourceBuffer(std::move(memBuffer), SMLoc());
+
+  auto recordKeeper = std::make_unique<llvm::RecordKeeper>();
+
+  SMLoc completeLoc = completePos.getAsSMLoc(sourceMgr);
+  TableGenCodeCompleteContext completeContext(completeLoc, completionList);
+  llvm::TableGenParseFile(sourceMgr, *recordKeeper, &completeContext);
+
   return completionList;
 }
 

@@ -663,6 +663,12 @@ public:
   TableGenCodeCompleteContext(SMLoc codeCompleteLoc,
                               lsp::CompletionList &completionList)
       : CodeCompleteContext(codeCompleteLoc), completionList(completionList) {}
+
+  void completeKeyword(StringRef keyword) override {
+    lsp::Logger::info("completeKeyword: {0}", keyword);
+    lsp::CompletionItem item(keyword, lsp::CompletionItemKind::Keyword);
+    completionList.items.emplace_back(item);
+  }
 };
 } // namespace
 

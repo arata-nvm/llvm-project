@@ -10,6 +10,14 @@ public:
 
   SMLoc getCodeCompleteLoc() const { return codeCompleteLoc; }
 
+  virtual void completeKeyword(StringRef keyword) = 0;
+
+  void completeKeywords(ArrayRef<StringRef> keywords) {
+    for (auto &keyword : keywords) {
+      completeKeyword(keyword);
+    }
+  }
+
 protected:
   explicit CodeCompleteContext(SMLoc codeCompleteLoc)
       : codeCompleteLoc(codeCompleteLoc) {}

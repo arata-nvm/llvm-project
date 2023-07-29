@@ -4313,6 +4313,13 @@ bool TGParser::ParseObjectList(MultiClass *MC) {
     if (ParseObject(MC))
       return true;
   }
+
+  if (Lex.isCodeComplete()) {
+    CompleteContext->completeKeywords({"assert", "class", "def", "defm",
+                                       "defset", "defvar", "foreach", "if",
+                                       "let", "multiclass"});
+  }
+
   return false;
 }
 

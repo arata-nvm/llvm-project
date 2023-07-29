@@ -18,6 +18,14 @@ public:
     }
   }
 
+  virtual void completeClass(StringRef class_) = 0;
+
+  void completeClasses(ArrayRef<StringRef> classes) {
+    for (auto &class_ : classes) {
+      completeClass(class_);
+    }
+  }
+
 protected:
   explicit CodeCompleteContext(SMLoc codeCompleteLoc)
       : codeCompleteLoc(codeCompleteLoc) {}

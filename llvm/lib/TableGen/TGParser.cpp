@@ -685,6 +685,9 @@ Init *TGParser::ParseObjectName(MultiClass *CurMultiClass) {
 ///
 Record *TGParser::ParseClassID() {
   if (Lex.getCode() != tgtok::Id) {
+    if (Lex.isCodeComplete()) {
+      CompleteClasses();
+    }
     TokError("expected name for ClassID");
     return nullptr;
   }
@@ -1070,6 +1073,12 @@ bool TGParser::ParseOptionalBitList(SmallVectorImpl<unsigned> &Ranges) {
 ///   Type ::= ClassID                      // Record Type
 ///
 RecTy *TGParser::ParseType() {
+  if (Lex.isCodeComplete()) {
+    CompleteContext->completeClasses(
+        {"string", "code", "bit", "bits", "int", "list", "dag"});
+    CompleteClasses();
+  }
+
   switch (Lex.getCode()) {
   default:
     TokError("Unknown token when expecting a type");
@@ -4369,6 +4378,12 @@ bool TGParser::CheckTemplateArgValues(
   }
 
   return false;
+}
+
+void TGParser::CompleteClasses() {
+  for (auto &[className, _] : Records.getClasses()) {
+    CompleteContext->completeClass(className);
+  }
 }
 
 #if !defined(NDEBUG) || defined(LLVM_ENABLE_DUMP)

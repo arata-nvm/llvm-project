@@ -669,6 +669,12 @@ public:
     lsp::CompletionItem item(keyword, lsp::CompletionItemKind::Keyword);
     completionList.items.emplace_back(item);
   }
+
+  void completeClass(StringRef class_) override {
+    lsp::Logger::info("completeClass: {0}", class_);
+    lsp::CompletionItem item(class_, lsp::CompletionItemKind::Class);
+    completionList.items.emplace_back(item);
+  }
 };
 } // namespace
 

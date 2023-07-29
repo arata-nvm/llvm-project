@@ -317,6 +317,8 @@ private: // Parser methods.
   bool ApplyLetStack(RecordsEntry &Entry);
   bool CheckTemplateArgValues(SmallVectorImpl<llvm::ArgumentInit *> &Values,
                               SMLoc Loc, Record *ArgsRec);
+
+  void CompleteClasses();
 };
 
 } // end namespace llvm

@@ -322,6 +322,7 @@ private: // Parser methods.
   void CompleteGlobals();
   void CompleteRecordValues(const Record *Rec);
   void CompleteRecordValuesWithoutTempleteArgs(const Record *Rec);
+  void CompleteInitValues(const Init *Init);
 };
 
 } // end namespace llvm

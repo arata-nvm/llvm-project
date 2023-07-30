@@ -3018,6 +3018,10 @@ Init *TGParser::ParseValue(Record *CurRec, RecTy *ItemType, IDParseMode Mode) {
     }
     case tgtok::dot: {
       if (Lex.Lex() != tgtok::Id) { // eat the .
+        if (Lex.isCodeComplete()) {
+          CompleteInitValues(Result);
+        }
+
         TokError("expected field identifier after '.'");
         return nullptr;
       }
@@ -4424,7 +4428,9 @@ void TGParser::CompleteRecordValues(const Record *Rec) {
   }
 }
 
-void TGParser::CompleteRecordValuesWithoutTempleteArgs(const Record *Rec) {
+std::vector<RecordVal> getValuesWithoutTempleteArgs(const Record *Rec) {
+  std::vector<RecordVal> values;
+
   for (auto &value : Rec->getValues()) {
     bool isTempleteArg = false;
     for (auto &arg : Rec->getTemplateArgs()) {
@@ -4433,12 +4439,34 @@ void TGParser::CompleteRecordValuesWithoutTempleteArgs(const Record *Rec) {
         break;
       }
     }
-    if (isTempleteArg) {
-      continue;
-    }
 
+    if (isTempleteArg)
+      continue;
+
+    values.emplace_back(value);
+  }
+
+  return values;
+}
+
+void TGParser::CompleteRecordValuesWithoutTempleteArgs(const Record *Rec) {
+  for (auto &value : getValuesWithoutTempleteArgs(Rec)) {
     auto valueName = disqualifyName(value.getName().str());
     CompleteContext->completeVariable(valueName);
+  }
+}
+
+void TGParser::CompleteInitValues(const Init *Init) {
+  auto *TI = dyn_cast<TypedInit>(Init);
+  if (!TI)
+    return;
+
+  auto *RecTy = dyn_cast<RecordRecTy>(TI->getType());
+  if (!RecTy)
+    return;
+
+  for (Record *R : RecTy->getClasses()) {
+    CompleteRecordValuesWithoutTempleteArgs(R);
   }
 }
 

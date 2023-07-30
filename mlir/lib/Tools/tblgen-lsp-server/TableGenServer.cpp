@@ -670,21 +670,21 @@ public:
     completionList.items.emplace_back(item);
   }
 
-  void completeClass(StringRef class_) override {
-    lsp::Logger::info("completeClass: {0}", class_);
-    lsp::CompletionItem item(class_, lsp::CompletionItemKind::Class);
+  void completeClass(StringRef name) override {
+    lsp::Logger::info("completeClass: {0}", name);
+    lsp::CompletionItem item(name, lsp::CompletionItemKind::Class);
     completionList.items.emplace_back(item);
   }
 
-  void completeValue(StringRef value) override {
-    lsp::Logger::info("completeValue: {0}", value);
-    lsp::CompletionItem item(value, lsp::CompletionItemKind::Value);
+  void completeValue(StringRef name) override {
+    lsp::Logger::info("completeValue: {0}", name);
+    lsp::CompletionItem item(name, lsp::CompletionItemKind::Value);
     completionList.items.emplace_back(item);
   }
 
-  void completeVariable(StringRef variable) override {
-    lsp::Logger::info("completeVariable: {0}", variable);
-    lsp::CompletionItem item(variable, lsp::CompletionItemKind::Variable);
+  void completeVariable(StringRef name) override {
+    lsp::Logger::info("completeVariable: {0}", name);
+    lsp::CompletionItem item(name, lsp::CompletionItemKind::Variable);
     completionList.items.emplace_back(item);
   }
 };

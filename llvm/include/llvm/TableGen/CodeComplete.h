@@ -18,27 +18,27 @@ public:
     }
   }
 
-  virtual void completeClass(StringRef class_) = 0;
+  virtual void completeClass(StringRef name) = 0;
 
-  void completeClasses(ArrayRef<StringRef> classes) {
-    for (auto &class_ : classes) {
-      completeClass(class_);
+  void completeClasses(ArrayRef<StringRef> names) {
+    for (auto &name : names) {
+      completeClass(name);
     }
   }
 
-  virtual void completeValue(StringRef value) = 0;
+  virtual void completeValue(StringRef name) = 0;
 
-  void completeValues(ArrayRef<StringRef> values) {
-    for (auto &value : values) {
-      completeValue(value);
+  void completeValues(ArrayRef<StringRef> names) {
+    for (auto &name : names) {
+      completeValue(name);
     }
   }
 
-  virtual void completeVariable(StringRef variable) = 0;
+  virtual void completeVariable(StringRef name) = 0;
 
-  void completeVariables(ArrayRef<StringRef> variables) {
-    for (auto &variable : variables) {
-      completeVariable(variable);
+  void completeVariables(ArrayRef<StringRef> names) {
+    for (auto &name : names) {
+      completeVariable(name);
     }
   }
 

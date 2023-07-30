@@ -4424,7 +4424,8 @@ std::string disqualifyName(std::string qualifiedName) {
 void TGParser::CompleteRecordValues(const Record *Rec) {
   for (auto &value : Rec->getValues()) {
     auto valueName = disqualifyName(value.getName().str());
-    CompleteContext->completeVariable(valueName);
+    auto valueTyp = value.getType()->getAsString();
+    CompleteContext->completeVariable(valueName, valueTyp);
   }
 }
 
@@ -4452,7 +4453,8 @@ std::vector<RecordVal> getValuesWithoutTempleteArgs(const Record *Rec) {
 void TGParser::CompleteRecordValuesWithoutTempleteArgs(const Record *Rec) {
   for (auto &value : getValuesWithoutTempleteArgs(Rec)) {
     auto valueName = disqualifyName(value.getName().str());
-    CompleteContext->completeVariable(valueName);
+    auto valueTyp = value.getType()->getAsString();
+    CompleteContext->completeVariable(valueName, valueTyp);
   }
 }
 

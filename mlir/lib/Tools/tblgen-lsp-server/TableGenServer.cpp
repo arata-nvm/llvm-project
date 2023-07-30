@@ -682,9 +682,10 @@ public:
     completionList.items.emplace_back(item);
   }
 
-  void completeVariable(StringRef name) override {
+  void completeVariable(StringRef name, StringRef detail) override {
     lsp::Logger::info("completeVariable: {0}", name);
     lsp::CompletionItem item(name, lsp::CompletionItemKind::Variable);
+    item.detail = detail;
     completionList.items.emplace_back(item);
   }
 };

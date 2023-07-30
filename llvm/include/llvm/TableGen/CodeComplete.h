@@ -34,7 +34,7 @@ public:
     }
   }
 
-  virtual void completeVariable(StringRef name) = 0;
+  virtual void completeVariable(StringRef name, StringRef detail = "") = 0;
 
   void completeVariables(ArrayRef<StringRef> names) {
     for (auto &name : names) {

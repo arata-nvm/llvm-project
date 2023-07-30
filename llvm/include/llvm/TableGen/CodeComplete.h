@@ -34,6 +34,14 @@ public:
     }
   }
 
+  virtual void completeVariable(StringRef variable) = 0;
+
+  void completeVariables(ArrayRef<StringRef> variables) {
+    for (auto &variable : variables) {
+      completeVariable(variable);
+    }
+  }
+
 protected:
   explicit CodeCompleteContext(SMLoc codeCompleteLoc)
       : codeCompleteLoc(codeCompleteLoc) {}

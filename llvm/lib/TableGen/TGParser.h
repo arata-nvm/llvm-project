@@ -319,6 +319,9 @@ private: // Parser methods.
                               SMLoc Loc, Record *ArgsRec);
 
   void CompleteClasses();
+  void CompleteGlobals();
+  void CompleteRecordValues(const Record *Rec);
+  void CompleteRecordValuesWithoutTempleteArgs(const Record *Rec);
 };
 
 } // end namespace llvm

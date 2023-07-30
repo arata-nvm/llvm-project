@@ -2614,6 +2614,8 @@ Init *TGParser::ParseSimpleValue(Record *CurRec, RecTy *ItemType,
 
   if (Lex.isCodeComplete()) {
     CompleteContext->completeValues({"true", "false"});
+    CompleteRecordValues(CurRec);
+    CompleteGlobals();
   }
 
   Init *R = nullptr;
@@ -3470,8 +3472,13 @@ bool TGParser::ParseBodyItem(Record *CurRec) {
   }
 
   // LET ID OptionalRangeList '=' Value ';'
-  if (Lex.Lex() != tgtok::Id)
+  if (Lex.Lex() != tgtok::Id) {
+    if (Lex.isCodeComplete()) {
+      CompleteRecordValuesWithoutTempleteArgs(CurRec);
+    }
+
     return TokError("expected field identifier after let");
+  }
 
   SMLoc IdLoc = Lex.getLoc();
   StringInit *FieldName = StringInit::get(Records, Lex.getCurStrVal());
@@ -4392,6 +4399,46 @@ bool TGParser::CheckTemplateArgValues(
 void TGParser::CompleteClasses() {
   for (auto &[className, _] : Records.getClasses()) {
     CompleteContext->completeClass(className);
+  }
+}
+
+void TGParser::CompleteGlobals() {
+  for (auto &[globalName, _] : Records.getGlobals()) {
+    CompleteContext->completeVariable(globalName);
+  }
+}
+
+std::string disqualifyName(std::string qualifiedName) {
+  size_t index = qualifiedName.find_last_of(':');
+  if (index == std::string::npos) {
+    return qualifiedName;
+  }
+
+  return qualifiedName.substr(index + 1);
+}
+
+void TGParser::CompleteRecordValues(const Record *Rec) {
+  for (auto &value : Rec->getValues()) {
+    auto valueName = disqualifyName(value.getName().str());
+    CompleteContext->completeVariable(valueName);
+  }
+}
+
+void TGParser::CompleteRecordValuesWithoutTempleteArgs(const Record *Rec) {
+  for (auto &value : Rec->getValues()) {
+    bool isTempleteArg = false;
+    for (auto &arg : Rec->getTemplateArgs()) {
+      if (arg->getAsUnquotedString() == value.getName()) {
+        isTempleteArg = true;
+        break;
+      }
+    }
+    if (isTempleteArg) {
+      continue;
+    }
+
+    auto valueName = disqualifyName(value.getName().str());
+    CompleteContext->completeVariable(valueName);
   }
 }
 

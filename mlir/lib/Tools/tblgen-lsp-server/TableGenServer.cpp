@@ -681,6 +681,12 @@ public:
     lsp::CompletionItem item(value, lsp::CompletionItemKind::Value);
     completionList.items.emplace_back(item);
   }
+
+  void completeVariable(StringRef variable) override {
+    lsp::Logger::info("completeVariable: {0}", variable);
+    lsp::CompletionItem item(variable, lsp::CompletionItemKind::Variable);
+    completionList.items.emplace_back(item);
+  }
 };
 } // namespace
 

@@ -2611,6 +2611,11 @@ Init *TGParser::ParseOperationCond(Record *CurRec, RecTy *ItemType) {
 ///
 Init *TGParser::ParseSimpleValue(Record *CurRec, RecTy *ItemType,
                                  IDParseMode Mode) {
+
+  if (Lex.isCodeComplete()) {
+    CompleteContext->completeValues({"true", "false"});
+  }
+
   Init *R = nullptr;
   switch (Lex.getCode()) {
   default:

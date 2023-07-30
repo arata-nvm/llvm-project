@@ -26,6 +26,14 @@ public:
     }
   }
 
+  virtual void completeValue(StringRef value) = 0;
+
+  void completeValues(ArrayRef<StringRef> values) {
+    for (auto &value : values) {
+      completeValue(value);
+    }
+  }
+
 protected:
   explicit CodeCompleteContext(SMLoc codeCompleteLoc)
       : codeCompleteLoc(codeCompleteLoc) {}

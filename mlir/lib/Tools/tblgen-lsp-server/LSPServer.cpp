@@ -106,7 +106,10 @@ void LSPServer::onInitialize(const InitializeParams &params,
            {"resolveProvider", false},
        }},
       {"hoverProvider", true},
-      {"completionProvider", true},
+      {
+          "completionProvider",
+          llvm::json::Object{{"triggerCharacters", llvm::json::Array{"."}}},
+      },
   };
 
   llvm::json::Object result{

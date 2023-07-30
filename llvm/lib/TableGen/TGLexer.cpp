@@ -142,6 +142,11 @@ tgtok::TokKind TGLexer::LexToken(bool FileOrLineStart) {
   // This always consumes at least one character.
   int CurChar = getNextChar();
 
+  // NOTE: is this right?
+  if (TokStart == CompleteLoc) {
+    return tgtok::CodeComplete;
+  }
+
   switch (CurChar) {
   default:
     // Handle letters: [a-zA-Z_]

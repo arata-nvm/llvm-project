@@ -3450,6 +3450,10 @@ bool TGParser::ParseTemplateArgList(Record *CurRec) {
 ///   BodyItem ::= Assert
 ///
 bool TGParser::ParseBodyItem(Record *CurRec) {
+  if (Lex.isCodeComplete()) {
+    CompleteContext->completeKeywords({"assert", "defvar", "let"});
+  }
+
   if (Lex.getCode() == tgtok::Assert)
     return ParseAssert(nullptr, CurRec);
 

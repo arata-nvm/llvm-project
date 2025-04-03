@@ -202,6 +202,7 @@ llvm::Error JSONTransport::run(MessageHandler &handler) {
           std::error_code(errno, std::system_category()));
     }
 
+    Logger::debug("<<< {0}\n", json);
     if (succeeded(readMessage(json))) {
       if (llvm::Expected<llvm::json::Value> doc = llvm::json::parse(json)) {
         if (!handleMessage(std::move(*doc), handler))

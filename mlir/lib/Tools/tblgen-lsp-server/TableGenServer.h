@@ -21,8 +21,10 @@ struct CompletionList;
 struct Diagnostic;
 struct DocumentLink;
 struct Hover;
+struct InlayHint;
 struct Location;
 struct Position;
+struct Range;
 struct TextDocumentContentChangeEvent;
 class URIForFile;
 
@@ -82,6 +84,9 @@ public:
 
   CompletionList getCodeCompletion(const URIForFile &uri,
                                    const Position &completePos);
+
+  std::vector<InlayHint> getInlayHints(const URIForFile &uri,
+                                       const Range &range);
 
 private:
   struct Impl;

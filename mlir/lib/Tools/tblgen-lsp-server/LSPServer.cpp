@@ -69,6 +69,9 @@ struct LSPServer {
   void onCompletion(const CompletionParams &params,
                     Callback<CompletionList> reply);
 
+  void onInlayHints(const InlayHintsParams &params,
+                    Callback<std::vector<InlayHint>> reply);
+
   //===--------------------------------------------------------------------===//
   // Fields
   //===--------------------------------------------------------------------===//
@@ -91,6 +94,7 @@ struct LSPServer {
 
 void LSPServer::onInitialize(const InitializeParams &params,
                              Callback<llvm::json::Value> reply) {
+  lsp::Logger::setLogLevel(lsp::Logger::Level::Debug);
   // Send a response with the capabilities of this server.
   llvm::json::Object serverCaps{
       {"textDocumentSync",
@@ -110,6 +114,7 @@ void LSPServer::onInitialize(const InitializeParams &params,
           "completionProvider",
           llvm::json::Object{{"triggerCharacters", llvm::json::Array{"."}}},
       },
+      {"inlayHintProvider", true},
   };
 
   llvm::json::Object result{
@@ -201,6 +206,11 @@ void LSPServer::onCompletion(const CompletionParams &params,
   reply(server.getCodeCompletion(params.textDocument.uri, params.position));
 }
 
+void LSPServer::onInlayHints(const InlayHintsParams &params,
+                             Callback<std::vector<InlayHint>> reply) {
+  reply(server.getInlayHints(params.textDocument.uri, params.range));
+}
+
 //===----------------------------------------------------------------------===//
 // Entry Point
 //===----------------------------------------------------------------------===//
@@ -240,6 +250,9 @@ LogicalResult mlir::lsp::runTableGenLSPServer(TableGenServer &server,
   // Code Completion
   messageHandler.method("textDocument/completion", &lspServer,
                         &LSPServer::onCompletion);
+
+  messageHandler.method("textDocument/inlayHint", &lspServer,
+                        &LSPServer::onInlayHints);
 
   // Diagnostics
   lspServer.publishDiagnostics =

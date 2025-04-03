@@ -377,7 +377,10 @@ public:
   //===--------------------------------------------------------------------===//
 
   lsp::CompletionList getCodeCompletion(const lsp::URIForFile &uri,
-                                        const lsp::Position completePos);
+                                        const lsp::Position &completePos);
+
+  std::vector<lsp::InlayHint> getInlayHints(const lsp::URIForFile &uri,
+                                            const lsp::Range &range);
 
 private:
   /// Initialize the text file from the given file contents.
@@ -468,7 +471,9 @@ void TableGenTextFile::initialize(const lsp::URIForFile &uri,
           ctx->diagnostics.push_back(*lspDiag);
       },
       &handlerContext);
+  lsp::Logger::debug("parse started");
   bool failedToParse = llvm::TableGenParseFile(sourceMgr, *recordKeeper);
+  lsp::Logger::debug("parse finished");
 
   // Process all of the include files.
   lsp::gatherIncludeFiles(sourceMgr, parsedIncludes);
@@ -476,7 +481,9 @@ void TableGenTextFile::initialize(const lsp::URIForFile &uri,
     return;
 
   // If we successfully parsed the file, we can now build the index.
+  lsp::Logger::debug("index started");
   index.initialize(*recordKeeper);
+  lsp::Logger::debug("index finished");
 }
 
 //===----------------------------------------------------------------------===//
@@ -693,7 +700,7 @@ public:
 
 lsp::CompletionList
 TableGenTextFile::getCodeCompletion(const lsp::URIForFile &uri,
-                                    const lsp::Position completePos) {
+                                    const lsp::Position &completePos) {
   lsp::CompletionList completionList;
 
   auto memBuffer = llvm::MemoryBuffer::getMemBuffer(contents, uri.file());
@@ -713,6 +720,16 @@ TableGenTextFile::getCodeCompletion(const lsp::URIForFile &uri,
   llvm::TableGenParseFile(sourceMgr, *recordKeeper, &completeContext);
 
   return completionList;
+}
+
+std::vector<lsp::InlayHint>
+TableGenTextFile::getInlayHints(const lsp::URIForFile &uri,
+                                const lsp::Range &range) {
+  std::vector<lsp::InlayHint> hints;
+  lsp::InlayHint hint(lsp::InlayHintKind::Parameter, lsp::Position(0, 0));
+  hint.label = "param:";
+  hints.emplace_back(hint);
+  return hints;
 }
 
 //===----------------------------------------------------------------------===//
@@ -818,4 +835,12 @@ lsp::TableGenServer::getCodeCompletion(const URIForFile &uri,
   if (fileIt != impl->files.end())
     return fileIt->second->getCodeCompletion(uri, completePos);
   return CompletionList();
+}
+
+std::vector<lsp::InlayHint>
+lsp::TableGenServer::getInlayHints(const URIForFile &uri, const Range &range) {
+  auto fileIt = impl->files.find(uri.file());
+  if (fileIt != impl->files.end())
+    return fileIt->second->getInlayHints(uri, range);
+  return {};
 }
